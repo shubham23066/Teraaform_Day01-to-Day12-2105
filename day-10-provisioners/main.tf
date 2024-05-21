@@ -51,35 +51,41 @@ resource "aws_route_table_association" "dev" {
     subnet_id = aws_subnet.dev.id
   
 }
-
+resource "aws_key_pair" "name12345" {
+  key_name = "public-12345"
+  public_key = file("C:/Users/prati/.ssh/id_ed25519.pub")
+}
 resource "aws_instance" "name" {
 ami = "ami-08188dffd130a1ac2"
-instance_type = t2.micro
+instance_type = "t2.micro"
 subnet_id = aws_subnet.dev.id
+key_name = aws_key_pair.name12345.key_name
+associate_public_ip_address = true
 vpc_security_group_ids = [aws_security_group.cust-sg.id]
 tags = {
-    Name = "new-test"
+    Name = "provisioner-ec2"
 }
+
 connection {
   type = "ssh"
   user = "ec2-user"
-  private_key = file("C:/Users/prati/.ssh")
+  private_key = file("C:/Users/prati/.ssh/id_ed25519")
   host = self.public_ip
 }
-
 provisioner "local-exec" {
   command = "touch file100"
 }
-
 provisioner "file" {
-  source = "file100"
-  destination = = "/home/ec2-user/file100"
+  source = "D:/Teraaform_Day01-to=Day12/day-10-provisioners/file100"
+  destination = "/home/ec2-user/file100"
+  }
+provisioner "remote-exec" {
+inline = [
+    "touch file200",
+    "echo hello from shubham >> file200",
+]
+
 }
-provisioner "remote-exec" 
-{
-
-
 }
-
 
   
